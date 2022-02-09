@@ -2,20 +2,8 @@ require("dotenv").config()
 const express = require("express")
 const app = express()
 const cors = require("cors")
-const paypal = require("@paypal/checkout-server-sdk")
 
 require('dotenv').config()
-
-const Environment =
-  process.env.NODE_ENV === "production"
-    ? paypal.core.LiveEnvironment
-    : paypal.core.SandboxEnvironment
-const paypalClient = new paypal.core.PayPalHttpClient(
-  new Environment(
-    process.env.PAYPAL_CLIENT_ID,
-    process.env.PAYPAL_CLIENT_SECRET
-  )
-)
 
 var port = process.env.PORT || 3000;
 app.use(express.json())
@@ -54,7 +42,7 @@ app.post("/create-checkout-session", async (req, res) => {
             currency: "usd",
             product_data: {
               name: item.name,
-              id : item.id
+              description: item.metadata,
             },  
             unit_amount: item.priceInCents,
           },
