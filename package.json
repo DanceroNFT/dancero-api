@@ -20,6 +20,7 @@
     "@paypal/checkout-server-sdk": "^1.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
+    "ejs": "^3.1.6",
     "express": "^4.17.2",
     "stripe": "^8.202.0"
   }

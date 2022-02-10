@@ -21,9 +21,11 @@ var port = process.env.PORT || 3000;
 app.use(express.json())
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: process.env.DANCERO_HOST,
   })
 )
+
+app.set('view engine', 'ejs');
 
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
@@ -34,7 +36,7 @@ app.get('/', async(req, res)=> {
 
 app.get('/success', async(req, res) => 
 {
-    res.send("success");
+    res.render('succesfullcard');
 });
 
 app.get('/failedpayment', async(req, res) => 
@@ -61,8 +63,9 @@ app.post("/create-checkout-session", async (req, res) => {
           quantity: item.quantity,
         }
       }),
-      success_url: 'http://localhost:3000/success',
-      cancel_url: 'http://localhost:3000/failedpayment',
+      success_url: process.env.DANCERO_API_SUCCESS,
+      cancel_url:  process.env.DANCERO_API_FAILED
+
     })
     res.json({ url: session.url })
   } catch (e) {
