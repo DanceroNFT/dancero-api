@@ -2,12 +2,11 @@ require("dotenv").config()
 const express = require("express")
 const app = express()
 const cors = require("cors")
-const sendgrid = require('@sendgrid/mail');
 const mongoose = require('mongoose');
+const nodemailer = require("nodemailer");
 
 require('dotenv').config()
 
-sendgrid.setApiKey(process.env.SENDGRID_APIKEY);
 
 var port = process.env.PORT || 3000;
 app.use(express.json())
@@ -18,8 +17,7 @@ app.use(
 app.set('view engine', 'ejs');
 
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
-// mongoose.connect('mongodb+srv://dancero:y5WSi0awpJVWenlI@cluster0.vquxk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
-mongoose.connect('mongodb+srv://ivan:1wSXkCsXPuJfRKz6@testdb.mvzn5.mongodb.net/test');
+mongoose.connect(process.env.MONGO_CONNECTION_STRING);
 
 const Data = mongoose.model('data', {
    user: String,
@@ -154,31 +152,38 @@ app.post('/sendmail', async (req , res) =>
   Payment status : ${data.paymentStatus} <br>
 
   `
-
   message = message.replace(/(\r\n|\n|\r)/gm, "");
-  sendMail(message );
+  sendMail(message);
   res.sendStatus(200);
 })
 
 
 function sendMail(data)
 {  
-  console.log(data)
-  const msg = {
+  console.log(process.env.SENDING_EMAIL);
+  var transporter = nodemailer.createTransport({
+    service: 'Yahoo',
+    auth: {
+      user: process.env.SENDING_EMAIL,
+      pass: process.env.SENDING_EMAIL_PASSWORD
+    }
+  });
+  
+  var mailOptions = {
+    from: process.env.SENDING_EMAIL,
     to: process.env.NOTIFICATION_MAIL,
-    from: 'ivan9711@outlook.com',
-    subject: 'Buy notification',
-    text:  JSON.stringify(data),
-    html: '<strong>' +  JSON.stringify(data) + '</strong>',
- }
- sendgrid
-    .send(msg)
-    .then((resp) => {
-      console.log('Email sent\n', resp)
-    })
-    .catch((error) => {
-      console.error(error)
-  })
+    subject: 'Sending Email using Node.js',
+    text: '<strong>' +  JSON.stringify(data) + '</strong>',
+  };
+  
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+
 }
 
 app.listen(port, () => {
