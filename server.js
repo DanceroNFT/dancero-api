@@ -1,11 +1,11 @@
-require("dotenv").config()
+//require("dotenv").config()
 const express = require("express")
 const app = express()
 const cors = require("cors")
 const mongoose = require('mongoose');
 const nodemailer = require("nodemailer");
 
-require('dotenv').config()
+//require('dotenv').config()
 
 
 var port = process.env.PORT || 3000;
